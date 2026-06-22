@@ -1,0 +1,132 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Electronics Assessment</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f6f9;padding:20px}
+.container{max-width:950px;margin:auto;background:white;padding:25px;border-radius:10px}
+.question{border:1px solid #ddd;padding:12px;margin:12px 0;border-radius:8px}
+.correct{color:green;font-weight:bold}
+.wrong{color:red;font-weight:bold}
+button{padding:10px 20px;background:#003366;color:white;border:none;border-radius:5px}
+input{padding:8px;margin:5px;width:250px}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Electronics Category Technical Assessment</h1>
+
+<div id="userSection">
+<p><input id="username" placeholder="Employee Name" required></p>
+<p><input id="department" placeholder="Department"></p>
+<button onclick="startQuiz()">Start Assessment</button>
+</div>
+
+<div id="quizSection" style="display:none">
+<form id="quiz"></form>
+<button onclick="submitQuiz(event)">Submit Assessment</button>
+</div>
+
+<div id="results"></div>
+</div>
+
+<script>
+const questions=[
+["Which TV technology uses self-illuminating pixels?",["QLED","Mini LED","OLED","LCD"],2],
+["What is the primary purpose of Quantum Dots in a QLED TV?",["Improve sound quality","Enhance color accuracy and brightness","Reduce power consumption only","Increase refresh rate"],1],
+["Compared to a conventional LED TV, Mini LED technology mainly improves:",["Smart TV speed","Local dimming precision and contrast","HDMI performance","Wi-Fi connectivity"],1],
+["Which HDR format supports dynamic metadata on a scene-by-scene basis?",["HDR10","HLG","Dolby Vision","SDR"],2],
+["What is the maximum resolution defined under 8K UHD?",["3840 × 2160","5120 × 2880","7680 × 4320","10240 × 7680"],2],
+["Which feature automatically adjusts the screen refresh rate to match game frame rates?",["MEMC","VRR","ALLM","HDR10+"],1],
+["What is the primary benefit of ALLM (Auto Low Latency Mode)?",["Better brightness","Improved audio quality","Reduced input lag during gaming","Improved color accuracy"],2],
+["Which HDMI version introduced support for 4K at 120Hz?",["HDMI 1.4","HDMI 2.0","HDMI 2.1","HDMI ARC"],2],
+["What is eARC designed to improve?",["Ethernet performance","Transmission of high-bitrate audio formats","TV software updates","Screen mirroring"],1],
+["Which TV component processes video signals, controls apps and manages system functions?",["Power Board","T-Con Board","Main Board (Motherboard)","Backlight"],2],
+["What is the primary function of the T-Con board?",["Manage Wi‑Fi","Control audio processing","Convert image data for panel display","Supply power to speakers"],2],
+["A customer complains of sound but no picture. Which component is most likely to have failed?",["Display panel or backlight system","Remote control","Wi‑Fi module","Android OS"],0],
+["Which panel technology generally provides the widest viewing angles?",["VA","TN","IPS","LCD"],2],
+["What is a key advantage of a VA panel over an IPS panel?",["Wider viewing angle","Better black levels and contrast","Faster OS","Better touch response"],1],
+["Dolby Atmos differs from conventional surround sound because it:",["Uses Bluetooth","Adds object-based audio positioning","Reduces bass","Uses fewer speakers"],1],
+["Which audio specification would generally produce the most immersive home theatre experience?",["2.0","2.1","5.1","7.1.4"],3],
+["Which operating system is used by Samsung Smart TVs?",["Android TV","Tizen OS","webOS","Roku TV"],1],
+["Which operating system is primarily associated with LG televisions?",["VIDAA","Tizen","webOS","Fire TV"],2],
+["What is one major advantage of Google TV over traditional Smart TV platforms?",["Lower electricity consumption","Personalized content aggregation across apps","Better panel quality","Higher refresh rate"],1],
+["Why is screen size growth considered one of the strongest trends in the TV industry?",["Consumers buy fewer TVs","Streaming and gaming demand larger displays","Smaller TVs unavailable","Manufacturing costs increasing"],1],
+["Which feature is most important for commercial digital signage applications?",["Gaming mode","High brightness and long operating hours","AI upscaling","Voice assistant"],1],
+["Interactive Flat Panels are increasingly replacing projectors because they:",["Require bulbs","Offer higher brightness, touch interaction and lower maintenance","Need dark rooms","Consume less power"],1],
+["What is the key difference between Android OS and AOSP in commercial displays?",["AOSP includes Google Services","Android has no app support","AOSP is open-source without certified Google services","Android only works on phones"],2],
+["Which category is expected to drive premium TV demand over the next 3 years?",["HD Ready","CRT","Large-screen QLED, Mini LED and OLED TVs","Non-smart TVs"],2],
+["A customer compares a 98-inch TCL Mini LED TV against a standard 98-inch LED TV. Which statement is technically correct?",["Both identical","Mini LED provides superior local dimming, contrast and HDR performance","LED better blacks","Mini LED improves sound only"],1]
+];
+
+function startQuiz(){
+ const user=document.getElementById("username").value.trim();
+ if(!user){alert("Enter employee name");return;}
+ if(localStorage.getItem("assessment_"+user)){
+   alert("This employee has already completed the assessment on this browser.");
+   return;
+ }
+
+ document.getElementById("userSection").style.display="none";
+ document.getElementById("quizSection").style.display="block";
+
+ let qhtml="";
+ questions.forEach((q,i)=>{
+   qhtml+=`<div class='question'><b>${i+1}. ${q[0]}</b><br>`;
+   q[1].forEach((o,j)=>{
+      qhtml+=`<label><input type='radio' name='q${i}' value='${j}'> ${o}</label><br>`;
+   });
+   qhtml+="</div>";
+ });
+ document.getElementById("quiz").innerHTML=qhtml;
+}
+
+function submitQuiz(e){
+ e.preventDefault();
+
+ const user=document.getElementById("username").value.trim();
+ const dept=document.getElementById("department").value.trim();
+
+ let score=0;
+ let review="<h3>Answer Review</h3>";
+
+ questions.forEach((q,i)=>{
+   const sel=document.querySelector(`input[name=q${i}]:checked`);
+   const chosen=sel?parseInt(sel.value):-1;
+
+   if(chosen===q[2]) score++;
+
+   review += `<p><b>Q${i+1}:</b> ${q[0]}<br>`;
+   review += `Correct Answer: <span class='correct'>${q[1][q[2]]}</span><br>`;
+
+   if(chosen>=0){
+      review += `Your Answer: ${chosen===q[2] ? "<span class='correct'>"+q[1][chosen]+"</span>" : "<span class='wrong'>"+q[1][chosen]+"</span>"}`;
+   } else {
+      review += "<span class='wrong'>Not Answered</span>";
+   }
+   review += "</p>";
+ });
+
+ let pct=((score/questions.length)*100).toFixed(1);
+ let status=pct>=70?"PASS":"FAIL";
+
+ localStorage.setItem("assessment_"+user, JSON.stringify({
+   name:user, department:dept, score:score, percentage:pct
+ }));
+
+ document.getElementById("quizSection").style.display="none";
+ document.getElementById("results").innerHTML=`
+ <h2>Assessment Results</h2>
+ <p><b>Name:</b> ${user}</p>
+ <p><b>Department:</b> ${dept}</p>
+ <p><b>Score:</b> ${score}/25 (${pct}%)</p>
+ <p><b>Status:</b> ${status}</p>
+ <hr>
+ ${review}
+ `;
+}
+</script>
+</body>
+</html>

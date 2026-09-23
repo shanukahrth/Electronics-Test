@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Advanced Electronics Assessment</title>
+<style>
+:root{
+  --navy:#0b2a4a; --navy2:#123d69; --accent:#1f7ae0; --bg:#eef2f7; --card:#fff;
+  --text:#1b2433; --muted:#64708a; --line:#dde3ec;
+  --ok:#157a3c; --okbg:#e5f6ec; --bad:#b42318; --badbg:#fdecea; --warn:#8a5a00; --warnbg:#fff4d6;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.45}
+header.top{background:var(--navy);color:#fff;padding:14px 16px}
+header.top .in{max-width:900px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+header.top h1{font-size:18px;margin:0;font-weight:600}
+.timer{font-variant-numeric:tabular-nums;background:rgba(255,255,255,.12);padding:6px 12px;border-radius:20px;font-weight:600;display:none}
+.who{font-size:13px;opacity:.85;display:none}
+main{max-width:900px;margin:20px auto;padding:0 16px}
+.card{background:var(--card);border-radius:12px;padding:24px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:16px}
+h2{margin:0 0 6px;font-size:22px;color:var(--navy)}
+.sub{color:var(--muted);margin:0 0 18px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}
+.chip{background:#eef4fc;color:var(--navy2);border-radius:20px;padding:5px 12px;font-size:13px;font-weight:600}
+label.f{display:block;font-weight:600;font-size:14px;margin:14px 0 6px}
+input.t{width:100%;max-width:420px;padding:11px 12px;border:1px solid var(--line);border-radius:8px;font-size:16px}
+input.t:focus{outline:2px solid var(--accent);border-color:transparent}
+.btn{background:var(--navy);color:#fff;border:0;border-radius:8px;padding:11px 20px;font-size:15px;font-weight:600;cursor:pointer}
+.btn:hover{background:var(--navy2)}
+.btn:disabled{background:#9aa6b8;cursor:not-allowed}
+.btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--line)}
+.btn.ghost:hover{background:#f4f7fb}
+.btn.green{background:var(--ok)}
+.msg{margin-top:14px;padding:10px 12px;border-radius:8px;font-size:14px;display:none}
+.msg.err{background:var(--badbg);color:var(--bad);display:block}
+.msg.info{background:#eef4fc;color:var(--navy2);display:block}
+.msg.warn{background:var(--warnbg);color:var(--warn);display:block}
+.hidden{display:none!important}
+
+/* quiz */
+.progress-row{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:6px}
+.bar{height:8px;background:#e2e8f0;border-radius:6px;overflow:hidden;margin-bottom:18px}
+.bar > i{display:block;height:100%;background:var(--accent);width:0;transition:width .25s}
+.section-tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+.qtext{font-size:19px;font-weight:600;margin:0 0 18px}
+.opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:13px 14px;margin-bottom:10px;font-size:16px;cursor:pointer;color:var(--text)}
+.opt:hover{border-color:#9dbbe6;background:#f8fbff}
+.opt .l{flex:0 0 30px;height:30px;border-radius:50%;background:#eef2f7;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--navy2)}
+.opt.sel{border-color:var(--accent);background:#eef5ff}
+.opt.sel .l{background:var(--accent);color:#fff}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:18px}
+.grid{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;margin-top:6px}
+.grid button{border:1px solid var(--line);background:#fff;border-radius:6px;padding:7px 0;font-size:13px;cursor:pointer;color:var(--muted)}
+.grid button.done{background:#dbe9fb;border-color:#b6d0f3;color:var(--navy2);font-weight:600}
+.grid button.cur{outline:2px solid var(--navy);outline-offset:1px}
+.small{font-size:13px;color:var(--muted)}
+
+/* results */
+.score-wrap{display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+.ring{width:130px;height:130px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-direction:column;background:conic-gradient(var(--ringc) calc(var(--p)*1%), #e6ebf2 0)}
+.ring > div{width:104px;height:104px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring b{font-size:26px;color:var(--navy)}
+.ring span{font-size:12px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;flex:1;min-width:240px}
+.stat{background:#f5f8fc;border-radius:10px;padding:10px 12px}
+.stat .k{font-size:12px;color:var(--muted)}
+.stat .v{font-size:18px;font-weight:700;color:var(--navy)}
+.badge{display:inline-block;padding:3px 12px;border-radius:14px;font-weight:700;font-size:14px}
+.badge.pass{background:var(--okbg);color:var(--ok)}
+.badge.fail{background:var(--badbg);color:var(--bad)}
+table.sec{width:100%;border-collapse:collapse;font-size:14px}
+table.sec th,table.sec td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}
+table.sec td.n{text-align:right;font-variant-numeric:tabular-nums}
+.minibar{height:6px;background:#e6ebf2;border-radius:4px;overflow:hidden;min-width:60px}
+.minibar i{display:block;height:100%;background:var(--accent)}
+.rv{border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
+.rv.right{border-left:5px solid var(--ok)}
+.rv.wrong{border-left:5px solid var(--bad)}
+.rv .qh{font-weight:600;margin-bottom:10px}
+.rv .o{padding:8px 10px;border-radius:7px;margin-bottom:5px;font-size:15px;display:flex;gap:8px;align-items:flex-start}
+.rv .o.correct{background:var(--okbg);color:var(--ok);font-weight:600}
+.rv .o.picked-wrong{background:var(--badbg);color:var(--bad);font-weight:600;text-decoration:line-through}
+.rv .o .tag{margin-left:auto;font-size:12px;font-weight:700;white-space:nowrap;text-decoration:none}
+.filter{display:flex;gap:8px;margin:0 0 12px;flex-wrap:wrap}
+.filter button{border:1px solid var(--line);background:#fff;border-radius:18px;padding:6px 14px;cursor:pointer;font-size:13px}
+.filter button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+/* modal */
+.modal-bg{position:fixed;inset:0;background:rgba(10,20,35,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
+.modal{background:#fff;border-radius:12px;max-width:420px;width:100%;padding:22px}
+.modal h3{margin:0 0 8px;color:var(--navy)}
+.modal .row{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+
+@media (max-width:560px){
+  .card{padding:18px}
+  .qtext{font-size:17px}
+  .grid{grid-template-columns:repeat(8,1fr)}
+  header.top h1{font-size:16px}
+}
+@media print{
+  header.top,.nav,.filter,#retryBox,.noprint{display:none!important}
+  body{background:#fff}
+  .card{box-shadow:none}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="in">
+    <h1>Advanced Electronics Knowledge Assessment</h1>
+    <span class="who" id="who"></span>
+    <span class="timer" id="timer">⏱ 00:00</span>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ LOGIN ============ -->
+<section id="loginView">
+  <div class="card">
+    <h2>Welcome</h2>
+    <p class="sub">Enter your details to begin. Your result will be recorded.</p>
+    <div class="chips">
+      <span class="chip">40 questions</span>
+      <span class="chip">100 marks (2.5 each)</span>
+      <span class="chip">No time limit – time is recorded</span>
+      <span class="chip" id="passChip">Pass mark 70%</span>
+    </div>
+
+    <div id="resumeBox" class="msg info hidden"></div>
+
+    <label class="f" for="empName">Employee name</label>
+    <input class="t" id="empName" autocomplete="name" placeholder="e.g. Kasun Perera">
+
+    <label class="f" for="empMsps">MSPS number</label>
+    <input class="t" id="empMsps" autocomplete="off" placeholder="e.g. 123456">
+
+    <div style="margin-top:20px">
+      <button class="btn" id="startBtn">Start assessment</button>
+    </div>
+    <div id="loginMsg" class="msg"></div>
+  </div>
+
+  <div class="card small">
+    <b>Instructions</b>
+    <ul style="margin:8px 0 0;padding-left:18px">
+      <li>Choose one answer for each question. You can go back and change answers before submitting.</li>
+      <li>You must answer all 40 questions to submit.</li>
+      <li>The timer shows how long you have taken. There is no time limit.</li>
+      <li>After submitting you will see your score and the correct answers.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ QUIZ ============ -->
+<section id="quizView" class="hidden">
+  <div class="card">
+    <div class="progress-row">
+      <span id="qCounter">Question 1 of 40</span>
+      <span id="answeredCount">0 answered</span>
+    </div>
+    <div class="bar"><i id="barFill"></i></div>
+
+    <span class="section-tag" id="qSection"></span>
+    <p class="qtext" id="qText"></p>
+    <div id="qOptions"></div>
+
+    <div class="nav">
+      <button class="btn ghost" id="prevBtn">← Previous</button>
+      <button class="btn" id="nextBtn">Next →</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="small" style="margin-bottom:6px">Jump to a question (shaded = answered)</div>
+    <div class="grid" id="qGrid"></div>
+    <div style="margin-top:16px;display:flex;justify-content:flex-end">
+      <button class="btn green" id="submitBtn">Submit assessment</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RESULTS ============ -->
+<section id="resultView" class="hidden">
+  <div class="card">
+    <h2>Your result</h2>
+    <p class="sub" id="resWho"></p>
+    <div class="score-wrap">
+      <div class="ring" id="ring"><div><b id="resPct">0%</b><span>score</span></div></div>
+      <div class="stats">
+        <div class="stat"><div class="k">Marks</div><div class="v" id="resMarks"></div></div>
+        <div class="stat"><div class="k">Correct answers</div><div class="v" id="resCorrect"></div></div>
+        <div class="stat"><div class="k">Time taken</div><div class="v" id="resTime"></div></div>
+        <div class="stat"><div class="k">Result</div><div class="v" id="resStatus"></div></div>
+      </div>
+    </div>
+    <div id="saveMsg" class="msg info">Saving your result…</div>
+    <div id="retryBox" class="hidden" style="margin-top:10px">
+      <button class="btn" id="retryBtn">Try saving again</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 style="font-size:18px">Score by section</h2>
+    <table class="sec" id="secTable"></table>
+  </div>
+
+  <div class="card">
+    <h2 style="font-size:18px">Answer review</h2>
+    <p class="sub">Correct answers are highlighted in green. Where you chose a different answer, your choice is shown in red.</p>
+    <div class="filter">
+      <button class="on" data-f="all">All 40</button>
+      <button data-f="wrong" id="fWrong">Incorrect</button>
+      <button data-f="right" id="fRight">Correct</button>
+    </div>
+    <div id="review"></div>
+    <div class="noprint" style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn ghost" onclick="window.print()">Print / save as PDF</button>
+      <button class="btn ghost" id="nextEmpBtn">Finish – next employee</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+/* =========================================================
+   SETTINGS – change these
+   ========================================================= */
+const CONFIG = {
+  // GitHub repo where results.json is stored (see SETUP.md)
+  GITHUB_OWNER: "shanukahrth",
+  GITHUB_REPO:  "Electronics-Test-Results",
+  FILE_PATH:    "results.json",
+  BRANCH:       "main",
+  // GitHub token: paste your token into TOKEN_PART_2 WITHOUT the "github_pat_" at the start
+  // (GitHub refuses to save a file that contains a complete token).
+  TOKEN_PART_1: "github_pat_",
+  TOKEN_PART_2: "PASTE_TOKEN_WITHOUT_github_pat_",
+  ALLOW_RETAKE: false,   // true = the same MSPS number can take the test again
+  PASS_PERCENT: 70,
+  MARKS_PER_QUESTION: 2.5,
+  TEST_ID: "advanced-electronics-v1"
+};
+
+/* =========================================================
+   QUESTIONS  [section, question, [A,B,C,D], correctIndex]
+   correctIndex: 0=A 1=B 2=C 3=D
+   ========================================================= */
+const S = {
+  A:"Display Technology", B:"Smart TV & Connectivity", C:"Audio",
+  D:"Customer Scenarios", E:"Commercial Knowledge", F:"Technical Problem Solving", G:"Emerging Technology"
+};
+const QUESTIONS = [
+ [S.A,"Which TV technology provides the deepest black levels?",["LED","QLED","OLED","Mini LED"],2],
+ [S.A,"Mini LED primarily improves:",["Internet speed","Local dimming and contrast","Speaker quality","Operating system"],1],
+ [S.A,"QLED technology mainly improves:",["Processing speed","Colour volume and brightness","Screen resolution","HDMI performance"],1],
+ [S.A,"Which display technology has the highest risk of burn-in?",["LED","OLED","QLED","Mini LED"],1],
+ [S.A,"A 4K TV has approximately:",["2 million pixels","4 million pixels","8.3 million pixels","16 million pixels"],2],
+ [S.A,"HDR10+ differs from HDR10 because it:",["Uses dynamic metadata","Requires HDMI 2.1","Increases refresh rate","Uses OLED panels only"],0],
+ [S.A,"Dolby Vision offers:",["Better Wi-Fi","Dynamic HDR optimisation","Better Bluetooth","Higher refresh rate"],1],
+ [S.A,"Which refresh rate is generally preferred for competitive gaming?",["50Hz","60Hz","120Hz","24Hz"],2],
+
+ [S.B,"eARC is mainly used for:",["Faster internet","High-quality audio transmission","Better picture quality","Screen mirroring"],1],
+ [S.B,"Which HDMI version is required for 4K at 120Hz?",["HDMI 1.4","HDMI 2.0","HDMI 2.1","VGA"],2],
+ [S.B,"Google TV is:",["A display technology","An operating system and content platform","A speaker technology","A gaming console"],1],
+ [S.B,"Which wireless technology is commonly used for screen casting?",["Bluetooth","Miracast","NFC","Infrared"],1],
+ [S.B,"Which Wi-Fi band generally provides higher speed?",["2.4GHz","5GHz","AM","FM"],1],
+ [S.B,"MEMC is mainly designed to:",["Improve sound","Reduce motion blur","Increase storage","Improve Wi-Fi"],1],
+
+ [S.C,"Dolby Atmos mainly improves:",["Video quality","Immersive surround sound","Bluetooth range","Battery life"],1],
+ [S.C,"A soundbar is primarily designed to:",["Replace Wi-Fi","Improve TV audio","Increase brightness","Expand storage"],1],
+ [S.C,"Which connection usually provides the best audio quality?",["AUX","Bluetooth","HDMI eARC","USB"],2],
+ [S.C,"Bluetooth audio delay is known as:",["Burn-in","Latency","Upscaling","Dimming"],1],
+
+ [S.D,"A PS5 gamer should ideally buy a TV with:",["50Hz","HDMI 2.1 and VRR","DVD player","VGA"],1],
+ [S.D,"Which TV is most suitable for a bright living room?",["OLED","QLED","Plasma","CRT"],1],
+ [S.D,"A hotel lobby should ideally use:",["OLED","Commercial Display","Projector","Portable TV"],1],
+ [S.D,"Which customer benefits most from Dolby Vision?",["Movie enthusiast","Office worker","Accountant","Student"],0],
+ [S.D,"Which feature is least important for watching cable TV?",["AI Upscaling","HDR","HDMI 2.1","Good processing"],2],
+ [S.D,"Which question should be asked first before recommending a TV?",["Favourite colour","Room size and viewing distance","Shoe size","Mobile brand"],1],
+
+ [S.E,"Gross margin means:",["Sales minus direct product cost","Sales after tax","Total profit","Cash flow"],0],
+ [S.E,"High inventory turnover generally indicates:",["Strong stock movement","Poor demand","High returns","High warranty claims"],0],
+ [S.E,"Which product usually delivers higher gross margins?",["Premium accessories","Entry-level TVs","Clearance products","End-of-life stock"],0],
+ [S.E,"Why should ageing stock be monitored?",["To reduce inventory carrying costs","To increase warranty","To improve Wi-Fi","To improve brightness"],0],
+ [S.E,"Cross-selling increases:",["Average transaction value","Screen size","Internet speed","Warranty period"],0],
+ [S.E,"Which KPI best measures stock efficiency?",["Inventory Turnover","Brightness","Wattage","Screen size"],0],
+
+ [S.F,"A customer cannot stream Netflix in 4K. The most likely reason is:",["Standard Netflix plan","HDMI cable","TV size","Remote battery"],0],
+ [S.F,"Picture is good but there is no sound through the soundbar. First check:",["HDMI eARC connection","TV stand","Wall mount","Brightness"],0],
+ [S.F,"Bluetooth pairing fails. First action:",["Restart Bluetooth devices","Replace TV","Factory repair","Buy another speaker"],0],
+ [S.F,"Customer experiences buffering only at night. Most likely cause:",["Internet congestion","Burn-in","HDR","Panel fault"],0],
+
+ [S.G,"AI Picture Mode mainly:",["Optimises picture automatically","Improves internet","Increases storage","Reduces power bills"],0],
+ [S.G,"Which technology provides the highest brightness today?",["OLED","Mini LED","Plasma","LCD"],1],
+ [S.G,"Which display technology is best for cinematic contrast?",["OLED","Standard LED","LCD","CRT"],0],
+ [S.G,"What is the primary purpose of a local dimming zone?",["Reduce power consumption","Improve contrast by controlling backlight","Increase internet speed","Improve sound"],1],
+ [S.G,"Why is HDMI 2.1 valuable for gamers?",["Faster charging","Supports 4K 120Hz, VRR and ALLM","Better Bluetooth","Better Wi-Fi"],1],
+ [S.G,"Which statement best describes an excellent electronics salesperson?",["Knows specifications only","Offers the cheapest product","Understands customer needs and recommends the best solution","Sells only premium products"],2]
+];
+const LETTERS = ["A","B","C","D"];
+const TOTAL = QUESTIONS.length;
+const STORE_KEY = "advElecTest_progress_" + CONFIG.TEST_ID;
+
+/* ---------- state ---------- */
+let state = null;      // {name, msps, attemptId, startedAt, answers[], current, submitted, result, saved}
+let timerHandle = null;
+
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function store(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} }
+function loadStore(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY)); }catch(e){ return null; } }
+function clearStore(){ try{ localStorage.removeItem(STORE_KEY); }catch(e){} }
+function fmtTime(sec){
+  sec = Math.max(0, Math.floor(sec));
+  const h = Math.floor(sec/3600), m = Math.floor(sec%3600/60), s = sec%60;
+  const p = n => String(n).padStart(2,"0");
+  return h ? `${h}:${p(m)}:${p(s)}` : `${p(m)}:${p(s)}`;
+}
+function fmtTimeWords(sec){
+  sec = Math.floor(sec);
+  const h = Math.floor(sec/3600), m = Math.floor(sec%3600/60), s = sec%60;
+  return (h? h+"h ":"") + (h||m? m+"m ":"") + s + "s";
+}
+function show(view){
+  ["loginView","quizView","resultView"].forEach(v => $(v).classList.toggle("hidden", v !== view));
+  window.scrollTo(0,0);
+}
+/* =========================================================
+   GITHUB STORAGE – reads and updates results.json directly
+   ========================================================= */
+const GH_TOKEN = CONFIG.TOKEN_PART_1 + CONFIG.TOKEN_PART_2.trim().replace(/^github_pat_/, "");
+const GH_URL = `https://api.github.com/repos/${CONFIG.GITHUB_OWNER}/${CONFIG.GITHUB_REPO}/contents/${CONFIG.FILE_PATH}`;
+function storageReady(){ return !/PASTE_/.test(GH_TOKEN) && GH_TOKEN.length > 20; }
+function ghHeaders(){
+  return { "Authorization":"Bearer " + GH_TOKEN, "Accept":"application/vnd.github+json", "X-GitHub-Api-Version":"2022-11-28" };
+}
+function b64encode(str){
+  const bytes = new TextEncoder().encode(str); let bin = "";
+  for(let i=0;i<bytes.length;i+=0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i,i+0x8000));
+  return btoa(bin);
+}
+function b64decode(b64){
+  const bin = atob(b64.replace(/\s/g,"")); const bytes = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+async function ghRead(){
+  const res = await fetch(`${GH_URL}?ref=${encodeURIComponent(CONFIG.BRANCH)}&t=${Date.now()}`, { headers: ghHeaders(), cache:"no-store" });
+  if(res.status === 404) return { records:[], sha:undefined };
+  if(!res.ok) throw new Error("github_read_" + res.status);
+  const data = await res.json();
+  const text = b64decode(data.content || "").trim();
+  return { records: text ? JSON.parse(text) : [], sha: data.sha };
+}
+// Read → change → write. Retries if two employees save at the same moment.
+async function ghUpdate(message, modify){
+  for(let attempt=0; attempt<6; attempt++){
+    const { records, sha } = await ghRead();
+    modify(records);
+    const res = await fetch(GH_URL, {
+      method:"PUT", headers: Object.assign({"Content-Type":"application/json"}, ghHeaders()),
+      body: JSON.stringify({ message, branch: CONFIG.BRANCH, content: b64encode(JSON.stringify(records, null, 2) + "\n"), ...(sha ? {sha} : {}) })
+    });
+    if(res.ok) return;
+    if(res.status === 409 || res.status === 422){ await new Promise(r => setTimeout(r, 400 + Math.random()*800*(attempt+1))); continue; }
+    throw new Error("github_write_" + res.status);
+  }
+  throw new Error("github_busy");
+}
+function sriLankaTime(d){
+  try{ return d.toLocaleString("en-GB",{timeZone:"Asia/Colombo",dateStyle:"medium",timeStyle:"medium"}); }catch(e){ return d.toISOString(); }
+}
+function newId(){ return (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2)); }
+
+async function saveToGitHub(payload){
+  if(!storageReady()) throw new Error("not_configured");
+  if(payload.action === "start"){
+    const now = new Date(), id = newId();
+    await ghUpdate(`Started: ${payload.name} (${payload.msps})`, records => {
+      if(!CONFIG.ALLOW_RETAKE && records.some(r => r.msps === payload.msps && r.status === "completed")){
+        const e = new Error("already_completed"); e.code = "already_completed"; throw e;
+      }
+      records.push({ id, name:payload.name, msps:payload.msps, status:"started",
+        startedAt: now.toISOString(), startedAtLocal: sriLankaTime(now),
+        completedAt:null, completedAtLocal:null, timeTaken:null, timeTakenSeconds:null,
+        correct:null, marks:null, percentage:null, result:null,
+        device: navigator.userAgent.slice(0,120) });
+    });
+    return { id, startedAt: now.toISOString() };
+  }
+  // complete
+  const r = state.result;
+  const sections = {};
+  Object.entries(r.sections).forEach(([k,v]) => sections[k] = `${v.correct}/${v.total}`);
+  const done = new Date(r.completedAt);
+  let id = payload.id;
+  await ghUpdate(`Completed: ${payload.name} (${payload.msps}) – ${r.percentage}%`, records => {
+    let rec = id ? records.find(x => x.id === id) : null;
+    if(!rec){
+      const st = new Date(payload.startedAt);
+      rec = { id: id || newId(), name:payload.name, msps:payload.msps, startedAt: st.toISOString(), startedAtLocal: sriLankaTime(st) };
+      records.push(rec);
+    }
+    id = rec.id;
+    if(rec.status === "completed") return;
+    Object.assign(rec, {
+      status:"completed", completedAt: r.completedAt, completedAtLocal: sriLankaTime(done),
+      timeTaken: fmtTimeWords(r.timeTakenSeconds), timeTakenSeconds: r.timeTakenSeconds,
+      correct: `${r.correct}/${r.total}`, marks: r.marks, percentage: r.percentage, result: r.status,
+      sections,
+      wrongQuestions: payload.answers.map((a,i) => a === QUESTIONS[i][3] ? null : i+1).filter(Boolean),
+      answers: payload.answers.map(a => LETTERS[a] || "-").join("")
+    });
+  });
+  return { id };
+}
+
+/* ---------- login ---------- */
+$("passChip").textContent = "Pass mark " + CONFIG.PASS_PERCENT + "%";
+
+(function initResume(){
+  const saved = loadStore();
+  if(!saved) return;
+  if(saved.submitted){
+    // Show last result again
+    state = saved;
+    showResults();
+    return;
+  }
+  const box = $("resumeBox");
+  box.classList.remove("hidden");
+  box.innerHTML = `An unfinished assessment for <b>${esc(saved.name)}</b> (MSPS ${esc(saved.msps)}) was found on this device.
+    <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" id="resumeBtn">Continue it</button>
+      <button class="btn ghost" id="discardBtn">Start a new one</button></div>`;
+  $("resumeBtn").onclick = () => { state = saved; enterQuiz(); };
+  $("discardBtn").onclick = () => { clearStore(); box.classList.add("hidden"); };
+})();
+
+$("startBtn").onclick = async () => {
+  const name = $("empName").value.trim().replace(/\s+/g," ");
+  const msps = $("empMsps").value.trim().toUpperCase();
+  const msg = $("loginMsg");
+  msg.className = "msg";
+  if(name.length < 2){ msg.className="msg err"; msg.textContent="Please enter your full name."; $("empName").focus(); return; }
+  if(!/^[A-Z0-9\-\/]{2,20}$/.test(msps)){ msg.className="msg err"; msg.textContent="Please enter a valid MSPS number (letters and numbers only)."; $("empMsps").focus(); return; }
+
+  const btn = $("startBtn");
+  btn.disabled = true; btn.textContent = "Starting…";
+
+  state = { name, msps, attemptId:null, startedAt:new Date().toISOString(),
+            answers:new Array(TOTAL).fill(-1), current:0, submitted:false, result:null, saved:false };
+
+  try{
+    const r = await saveToGitHub({ action:"start", name, msps });
+    state.attemptId = r.id;
+    if(r.startedAt) state.startedAt = r.startedAt;
+  }catch(e){
+    if(e.code === "already_completed"){
+      btn.disabled = false; btn.textContent = "Start assessment";
+      msg.className = "msg err";
+      msg.textContent = "Our records show MSPS " + msps + " has already completed this assessment. Please contact your manager if you need to retake it.";
+      state = null;
+      return;
+    }
+    // Network or config issue: allow the test to continue; the result is saved at the end.
+    console.warn("Start not recorded:", e.message);
+  }
+  btn.disabled = false; btn.textContent = "Start assessment";
+  store();
+  enterQuiz();
+};
+$("empMsps").addEventListener("keydown", e => { if(e.key === "Enter") $("startBtn").click(); });
+
+/* ---------- quiz ---------- */
+function enterQuiz(){
+  show("quizView");
+  $("who").textContent = state.name + " · " + state.msps;
+  $("who").style.display = "inline";
+  $("timer").style.display = "inline-block";
+  buildGrid();
+  renderQuestion();
+  startTimer();
+}
+
+function startTimer(){
+  clearInterval(timerHandle);
+  const tick = () => {
+    const sec = (Date.now() - new Date(state.startedAt).getTime())/1000;
+    $("timer").textContent = "⏱ " + fmtTime(sec);
+  };
+  tick();
+  timerHandle = setInterval(tick, 1000);
+}
+
+function buildGrid(){
+  const g = $("qGrid"); g.innerHTML = "";
+  for(let i=0;i<TOTAL;i++){
+    const b = document.createElement("button");
+    b.textContent = i+1;
+    b.onclick = () => { state.current = i; store(); renderQuestion(); };
+    g.appendChild(b);
+  }
+}
+
+function renderQuestion(){
+  const i = state.current, q = QUESTIONS[i];
+  $("qCounter").textContent = `Question ${i+1} of ${TOTAL}`;
+  $("qSection").textContent = q[0];
+  $("qText").textContent = (i+1) + ". " + q[1];
+  const box = $("qOptions"); box.innerHTML = "";
+  q[2].forEach((opt,j) => {
+    const b = document.createElement("button");
+    b.className = "opt" + (state.answers[i] === j ? " sel" : "");
+    b.innerHTML = `<span class="l">${LETTERS[j]}</span><span>${esc(opt)}</span>`;
+    b.onclick = () => {
+      state.answers[i] = j; store(); renderQuestion();
+      // auto-advance after a short pause
+      if(i < TOTAL-1) setTimeout(() => { if(state.current === i){ state.current = i+1; store(); renderQuestion(); } }, 300);
+    };
+    box.appendChild(b);
+  });
+  const answered = state.answers.filter(a => a >= 0).length;
+  $("answeredCount").textContent = answered + " answered";
+  $("barFill").style.width = (answered/TOTAL*100) + "%";
+  $("prevBtn").disabled = i === 0;
+  $("nextBtn").textContent = i === TOTAL-1 ? "Review & submit" : "Next →";
+  [...$("qGrid").children].forEach((b,k) => {
+    b.classList.toggle("done", state.answers[k] >= 0);
+    b.classList.toggle("cur", k === i);
+  });
+}
+
+$("prevBtn").onclick = () => { if(state.current > 0){ state.current--; store(); renderQuestion(); } };
+$("nextBtn").onclick = () => {
+  if(state.current < TOTAL-1){ state.current++; store(); renderQuestion(); }
+  else $("submitBtn").click();
+};
+
+$("submitBtn").onclick = () => {
+  const missing = state.answers.map((a,i) => a < 0 ? i+1 : null).filter(Boolean);
+  if(missing.length){
+    modal("Some questions are not answered",
+      `Please answer all questions before submitting. Unanswered: <b>${missing.join(", ")}</b>`,
+      [{label:"Go to question " + missing[0], primary:true, fn:() => { state.current = missing[0]-1; renderQuestion(); }}]);
+    return;
+  }
+  modal("Submit your assessment?",
+    "You will not be able to change your answers after submitting.",
+    [{label:"Keep checking", fn:()=>{}}, {label:"Submit", primary:true, fn:submit}]);
+};
+
+function modal(title, html, buttons){
+  const bg = document.createElement("div");
+  bg.className = "modal-bg";
+  bg.innerHTML = `<div class="modal" role="dialog" aria-modal="true"><h3>${esc(title)}</h3><div>${html}</div><div class="row"></div></div>`;
+  const row = bg.querySelector(".row");
+  buttons.forEach(b => {
+    const el = document.createElement("button");
+    el.className = "btn" + (b.primary ? "" : " ghost");
+    el.textContent = b.label;
+    el.onclick = () => { bg.remove(); b.fn(); };
+    row.appendChild(el);
+  });
+  document.body.appendChild(bg);
+}
+
+/* ---------- scoring ---------- */
+function computeResult(){
+  let correct = 0;
+  const sections = {};
+  QUESTIONS.forEach((q,i) => {
+    const ok = state.answers[i] === q[3];
+    if(ok) correct++;
+    sections[q[0]] = sections[q[0]] || {correct:0,total:0};
+    sections[q[0]].total++;
+    if(ok) sections[q[0]].correct++;
+  });
+  const completedAt = new Date().toISOString();
+  const seconds = Math.round((new Date(completedAt) - new Date(state.startedAt))/1000);
+  const marks = correct * CONFIG.MARKS_PER_QUESTION;
+  const pct = Math.round(correct/TOTAL*1000)/10;
+  return { correct, total:TOTAL, marks, maxMarks:TOTAL*CONFIG.MARKS_PER_QUESTION, percentage:pct,
+           status: pct >= CONFIG.PASS_PERCENT ? "PASS" : "FAIL", completedAt, timeTakenSeconds:seconds, sections };
+}
+
+function submit(){
+  clearInterval(timerHandle);
+  state.result = computeResult();
+  state.submitted = true;
+  store();
+  showResults();
+  saveResult();
+}
+
+async function saveResult(){
+  const m = $("saveMsg");
+  $("retryBox").classList.add("hidden");
+  if(state.saved){ m.className="msg info"; m.textContent="✓ Your result has been recorded."; return; }
+  m.className = "msg info"; m.textContent = "Saving your result…";
+  try{
+    const r = await saveToGitHub({
+      action:"complete", id:state.attemptId, name:state.name, msps:state.msps,
+      startedAt:state.startedAt, answers:state.answers
+    });
+    state.saved = true;
+    if(r.id) state.attemptId = r.id;
+    store();
+    m.textContent = "✓ Your result has been recorded.";
+  }catch(e){
+    m.className = "msg warn";
+    m.textContent = e.message === "not_configured"
+      ? "Result could not be saved: the test is not connected to the results storage yet (GitHub token not set). Please show this screen to your manager."
+      : "Your result could not be saved (network problem). Please check your connection and press ‘Try saving again’. Do not close this page.";
+    $("retryBox").classList.remove("hidden");
+  }
+}
+$("retryBtn").onclick = saveResult;
+$("nextEmpBtn").onclick = () => {
+  const go = () => { clearStore(); location.reload(); };
+  if(state.saved) return modal("Clear this result from the screen?",
+    "Your result is already recorded. This clears it from this device so the next employee can start.",
+    [{label:"Cancel", fn:()=>{}}, {label:"Clear", primary:true, fn:go}]);
+  modal("Result not saved yet",
+    "This result has NOT been recorded yet. If you clear it now it will be lost.",
+    [{label:"Cancel", primary:true, fn:()=>{}}, {label:"Clear anyway", fn:go}]);
+};
+
+/* ---------- results ---------- */
+function showResults(){
+  show("resultView");
+  $("timer").style.display = "none";
+  $("who").textContent = state.name + " · " + state.msps;
+  $("who").style.display = "inline";
+  const r = state.result;
+  $("resWho").textContent = `${state.name} · MSPS ${state.msps} · completed ${new Date(r.completedAt).toLocaleString()}`;
+  $("resPct").textContent = r.percentage + "%";
+  const ring = $("ring");
+  ring.style.setProperty("--p", r.percentage);
+  ring.style.setProperty("--ringc", r.status === "PASS" ? "var(--ok)" : "var(--bad)");
+  $("resMarks").textContent = `${r.marks} / ${r.maxMarks}`;
+  $("resCorrect").textContent = `${r.correct} / ${r.total}`;
+  $("resTime").textContent = fmtTimeWords(r.timeTakenSeconds);
+  $("resStatus").innerHTML = `<span class="badge ${r.status === "PASS" ? "pass" : "fail"}">${r.status}</span>`;
+
+  let t = "<tr><th>Section</th><th class='n'>Correct</th><th class='n'>Marks</th><th style='width:30%'></th></tr>";
+  Object.entries(r.sections).forEach(([name,s]) => {
+    const p = s.correct/s.total*100;
+    t += `<tr><td>${esc(name)}</td><td class="n">${s.correct}/${s.total}</td>
+          <td class="n">${s.correct*CONFIG.MARKS_PER_QUESTION}/${s.total*CONFIG.MARKS_PER_QUESTION}</td>
+          <td><div class="minibar"><i style="width:${p}%"></i></div></td></tr>`;
+  });
+  $("secTable").innerHTML = t;
+
+  const wrongCount = r.total - r.correct;
+  $("fWrong").textContent = `Incorrect (${wrongCount})`;
+  $("fRight").textContent = `Correct (${r.correct})`;
+  renderReview("all");
+
+  if(state.saved){ $("saveMsg").className="msg info"; $("saveMsg").textContent="✓ Your result has been recorded."; }
+  else if(!document.querySelector(".modal-bg")) { /* saveResult called by submit or below */ }
+}
+
+function renderReview(filter){
+  let h = "";
+  QUESTIONS.forEach((q,i) => {
+    const chosen = state.answers[i], ok = chosen === q[3];
+    if(filter === "wrong" && ok) return;
+    if(filter === "right" && !ok) return;
+    h += `<div class="rv ${ok ? "right" : "wrong"}">
+      <div class="qh">${ok ? "✅" : "❌"} ${i+1}. ${esc(q[1])} <span class="small">· ${esc(q[0])}</span></div>`;
+    q[2].forEach((opt,j) => {
+      let cls = "", tag = "";
+      if(j === q[3]){ cls = "correct"; tag = chosen === j ? "Your answer ✓" : "Correct answer"; }
+      else if(j === chosen){ cls = "picked-wrong"; tag = "Your answer"; }
+      h += `<div class="o ${cls}"><b>${LETTERS[j]}.</b><span>${esc(opt)}</span>${tag ? `<span class="tag">${tag}</span>` : ""}</div>`;
+    });
+    h += "</div>";
+  });
+  $("review").innerHTML = h || "<p class='small'>Nothing to show.</p>";
+}
+document.querySelectorAll(".filter button").forEach(b => b.onclick = () => {
+  document.querySelectorAll(".filter button").forEach(x => x.classList.remove("on"));
+  b.classList.add("on");
+  renderReview(b.dataset.f);
+});
+
+// If the page was reloaded after submitting but before the save succeeded, try again.
+if(state && state.submitted && !state.saved) saveResult();
+
+// Warn before leaving mid-test
+window.addEventListener("beforeunload", e => {
+  if(state && !state.submitted){ e.preventDefault(); e.returnValue = ""; }
+});
+</script>
+</body>
+</html>

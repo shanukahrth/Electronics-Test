@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Advanced Electronics Assessment</title>
+<title>Electronics & Commercial Test</title>
 <style>
 :root{
   --navy:#0b2a4a; --navy2:#123d69; --accent:#1f7ae0; --bg:#eef2f7; --card:#fff;
@@ -109,7 +109,7 @@ table.sec td.n{text-align:right;font-variant-numeric:tabular-nums}
 
 <header class="top">
   <div class="in">
-    <h1>Advanced Electronics Knowledge Assessment</h1>
+    <h1>Advanced Electronics &amp; Commercial Knowledge Test</h1>
     <span class="who" id="who"></span>
     <span class="timer" id="timer">⏱ 00:00</span>
   </div>
@@ -123,9 +123,9 @@ table.sec td.n{text-align:right;font-variant-numeric:tabular-nums}
     <h2>Welcome</h2>
     <p class="sub">Enter your details to begin. Your result will be recorded.</p>
     <div class="chips">
-      <span class="chip">40 questions</span>
-      <span class="chip">100 marks (2.5 each)</span>
-      <span class="chip">No time limit – time is recorded</span>
+      <span class="chip">50 questions</span>
+      <span class="chip">100 marks (2 each)</span>
+      <span class="chip">Suggested time 60 min – no hard limit</span>
       <span class="chip" id="passChip">Pass mark 70%</span>
     </div>
 
@@ -147,8 +147,8 @@ table.sec td.n{text-align:right;font-variant-numeric:tabular-nums}
     <b>Instructions</b>
     <ul style="margin:8px 0 0;padding-left:18px">
       <li>Choose one answer for each question. You can go back and change answers before submitting.</li>
-      <li>You must answer all 40 questions to submit.</li>
-      <li>The timer shows how long you have taken. There is no time limit.</li>
+      <li>You must answer all 50 questions to submit.</li>
+      <li>The suggested time is 60 minutes. The timer shows how long you have taken, and the test won't stop you if you go over.</li>
       <li>After submitting you will see your score and the correct answers.</li>
     </ul>
   </div>
@@ -158,7 +158,7 @@ table.sec td.n{text-align:right;font-variant-numeric:tabular-nums}
 <section id="quizView" class="hidden">
   <div class="card">
     <div class="progress-row">
-      <span id="qCounter">Question 1 of 40</span>
+      <span id="qCounter">Question 1 of 50</span>
       <span id="answeredCount">0 answered</span>
     </div>
     <div class="bar"><i id="barFill"></i></div>
@@ -194,6 +194,7 @@ table.sec td.n{text-align:right;font-variant-numeric:tabular-nums}
         <div class="stat"><div class="k">Correct answers</div><div class="v" id="resCorrect"></div></div>
         <div class="stat"><div class="k">Time taken</div><div class="v" id="resTime"></div></div>
         <div class="stat"><div class="k">Result</div><div class="v" id="resStatus"></div></div>
+        <div class="stat" style="grid-column:1/-1"><div class="k">Level</div><div class="v" id="resLevel" style="font-size:16px"></div></div>
       </div>
     </div>
     <div id="saveMsg" class="msg info">Saving your result…</div>
@@ -211,7 +212,7 @@ table.sec td.n{text-align:right;font-variant-numeric:tabular-nums}
     <h2 style="font-size:18px">Answer review</h2>
     <p class="sub">Correct answers are highlighted in green. Where you chose a different answer, your choice is shown in red.</p>
     <div class="filter">
-      <button class="on" data-f="all">All 40</button>
+      <button class="on" data-f="all" id="fAll">All</button>
       <button data-f="wrong" id="fWrong">Incorrect</button>
       <button data-f="right" id="fRight">Correct</button>
     </div>
@@ -238,11 +239,11 @@ const CONFIG = {
   // GitHub token: paste your token into TOKEN_PART_2 WITHOUT the "github_pat_" at the start
   // (GitHub refuses to save a file that contains a complete token).
   TOKEN_PART_1: "github_pat_",
-  TOKEN_PART_2: "11BZK3HGI0cMgF5zd5Ud9A_8i9dtWfQqcTInTTr41V0rsyZ9gK1a8SCR6U8OdgvIE1WACA6WCCC1W8kA8L",
+  TOKEN_PART_2: "PASTE_TOKEN_WITHOUT_github_pat_",
   ALLOW_RETAKE: false,   // true = the same MSPS number can take the test again
   PASS_PERCENT: 70,
-  MARKS_PER_QUESTION: 2.5,
-  TEST_ID: "advanced-electronics-v1"
+  MARKS_PER_QUESTION: 2,
+  TEST_ID: "electronics-commercial-v2"
 };
 
 /* =========================================================
@@ -250,58 +251,73 @@ const CONFIG = {
    correctIndex: 0=A 1=B 2=C 3=D
    ========================================================= */
 const S = {
-  A:"Display Technology", B:"Smart TV & Connectivity", C:"Audio",
-  D:"Customer Scenarios", E:"Commercial Knowledge", F:"Technical Problem Solving", G:"Emerging Technology"
+  A:"Display Technology", B:"Smart TV & Connectivity", C:"Audio Technology",
+  D:"Customer & Product Application", E:"International Trade & Shipping"
 };
 const QUESTIONS = [
- [S.A,"Which TV technology provides the deepest black levels?",["LED","QLED","OLED","Mini LED"],2],
- [S.A,"Mini LED primarily improves:",["Internet speed","Local dimming and contrast","Speaker quality","Operating system"],1],
- [S.A,"QLED technology mainly improves:",["Processing speed","Colour volume and brightness","Screen resolution","HDMI performance"],1],
- [S.A,"Which display technology has the highest risk of burn-in?",["LED","OLED","QLED","Mini LED"],1],
- [S.A,"A 4K TV has approximately:",["2 million pixels","4 million pixels","8.3 million pixels","16 million pixels"],2],
- [S.A,"HDR10+ differs from HDR10 because it:",["Uses dynamic metadata","Requires HDMI 2.1","Increases refresh rate","Uses OLED panels only"],0],
- [S.A,"Dolby Vision offers:",["Better Wi-Fi","Dynamic HDR optimisation","Better Bluetooth","Higher refresh rate"],1],
- [S.A,"Which refresh rate is generally preferred for competitive gaming?",["50Hz","60Hz","120Hz","24Hz"],2],
+ [S.A,"Which display technology can independently switch individual pixels completely off?",["QLED","OLED","Mini LED","Standard LED LCD"],1],
+ [S.A,"What is the main advantage of Mini LED technology over conventional LED backlighting?",["Higher number of individually controllable backlight zones","Built-in Google TV","Higher Wi-Fi speed","Lower screen resolution"],0],
+ [S.A,"QLED technology primarily uses:",["Self-emitting OLED pixels","Plasma cells","Quantum dots combined with an LED/LCD backlight","Laser projection"],2],
+ [S.A,"A major characteristic of OLED displays is:",["They require a separate LED backlight","They can produce very deep blacks because individual pixels can turn off","They cannot display HDR","They always consume more power than LED TVs"],1],
+ [S.A,"Approximately how many pixels does a 4K UHD television have?",["1 million","2 million","4 million","8.3 million"],3],
+ [S.A,"What is the primary purpose of HDR?",["Improve internet connectivity","Increase the number of HDMI ports","Expand brightness and contrast range and reproduce a wider range of image information","Increase speaker volume"],2],
+ [S.A,"What distinguishes HDR10+ from standard HDR10?",["HDR10+ uses dynamic metadata","HDR10+ requires an OLED panel","HDR10+ only works with 8K TVs","HDR10+ increases the TV refresh rate"],0],
+ [S.A,"Dolby Vision is primarily associated with:",["Wireless audio","Dynamic HDR","Wi-Fi connectivity","Screen mirroring"],1],
+ [S.A,"A 120Hz television is particularly beneficial for:",["Customers who only listen to FM radio","Customers using the TV mainly as a clock","Gaming and fast-moving content","Customers who never watch video"],2],
+ [S.A,"What does VRR do?",["Automatically adjusts the screen refresh rate to better match the gaming console or graphics output","Improves Wi-Fi signal strength","Increases speaker wattage","Converts HD content into 8K"],0],
+ [S.A,"What is the primary purpose of local dimming?",["Increase storage capacity","Improve contrast by controlling different areas of the backlight independently","Improve Bluetooth connectivity","Reduce the TV's screen size"],1],
+ [S.A,"MEMC technology is primarily intended to:",["Improve motion smoothness","Improve Wi-Fi speed","Increase HDMI bandwidth","Improve voice recognition"],0],
 
- [S.B,"eARC is mainly used for:",["Faster internet","High-quality audio transmission","Better picture quality","Screen mirroring"],1],
- [S.B,"Which HDMI version is required for 4K at 120Hz?",["HDMI 1.4","HDMI 2.0","HDMI 2.1","VGA"],2],
- [S.B,"Google TV is:",["A display technology","An operating system and content platform","A speaker technology","A gaming console"],1],
- [S.B,"Which wireless technology is commonly used for screen casting?",["Bluetooth","Miracast","NFC","Infrared"],1],
- [S.B,"Which Wi-Fi band generally provides higher speed?",["2.4GHz","5GHz","AM","FM"],1],
- [S.B,"MEMC is mainly designed to:",["Improve sound","Reduce motion blur","Increase storage","Improve Wi-Fi"],1],
+ [S.B,"What is Google TV?",["A display panel technology","A type of HDMI cable","A smart TV user interface and content platform built on Android TV technology","A sound processing technology"],2],
+ [S.B,"HDMI eARC is primarily used to:",["Provide higher-bandwidth audio return from the TV to a compatible audio device","Increase TV brightness","Improve Wi-Fi range","Increase storage capacity"],0],
+ [S.B,"Which HDMI standard is generally associated with features such as 4K at 120Hz, VRR and ALLM?",["HDMI 1.0","HDMI 1.4","HDMI 2.0","HDMI 2.1"],3],
+ [S.B,"Which wireless standard is commonly used for casting or mirroring a compatible device's screen?",["NFC","Miracast","FM","GPS"],1],
+ [S.B,"A customer experiences buffering on streaming services even though the TV is connected to Wi-Fi. What should be checked first?",["Screen size","Picture mode","Internet speed and network stability","HDMI version"],2],
+ [S.B,"Why can a 5GHz Wi-Fi connection be faster than 2.4GHz?",["It always has unlimited range","It generally offers higher bandwidth and less congestion, although its range through walls is usually shorter","It uses a wired connection","It increases TV processing power"],1],
+ [S.B,"A customer connects a soundbar through HDMI ARC/eARC but gets no sound. Which should be checked first?",["Whether the TV and soundbar are connected to the correct ARC/eARC ports and the audio output settings are configured correctly","TV screen brightness","TV colour temperature","Bluetooth version of the customer's phone"],0],
+ [S.B,"Which feature is particularly relevant when recommending a TV to a PlayStation 5 customer?",["FM Radio","HDMI 2.1, 120Hz and VRR","Composite video input only","DVD playback"],1],
 
- [S.C,"Dolby Atmos mainly improves:",["Video quality","Immersive surround sound","Bluetooth range","Battery life"],1],
- [S.C,"A soundbar is primarily designed to:",["Replace Wi-Fi","Improve TV audio","Increase brightness","Expand storage"],1],
- [S.C,"Which connection usually provides the best audio quality?",["AUX","Bluetooth","HDMI eARC","USB"],2],
- [S.C,"Bluetooth audio delay is known as:",["Burn-in","Latency","Upscaling","Dimming"],1],
+ [S.C,"What is the main purpose of Dolby Atmos?",["Improve image resolution","Provide an immersive audio experience with sound positioned around and above the listener","Increase Bluetooth range","Improve Wi-Fi speed"],1],
+ [S.C,"A customer complains that Bluetooth audio is slightly delayed compared with the TV picture. This is primarily known as:",["Upscaling","Dimming","Latency","Compression ratio"],2],
+ [S.C,"Which connection generally supports high-bandwidth TV-to-audio-device formats most effectively?",["HDMI eARC","FM","RCA only","Infrared"],0],
+ [S.C,"Which product would generally be most appropriate for a customer who wants powerful sound for outdoor parties?",["Basic TV speaker","Party speaker","Computer monitor","TV wall mount"],1],
+ [S.C,"What is a key advantage of a soundbar compared with built-in TV speakers?",["It improves the TV's screen resolution","It provides a dedicated audio system that can deliver better sound and wider soundstage","It increases internet speed","It automatically upgrades the TV to 8K"],1],
 
- [S.D,"A PS5 gamer should ideally buy a TV with:",["50Hz","HDMI 2.1 and VRR","DVD player","VGA"],1],
- [S.D,"Which TV is most suitable for a bright living room?",["OLED","QLED","Plasma","CRT"],1],
- [S.D,"A hotel lobby should ideally use:",["OLED","Commercial Display","Projector","Portable TV"],1],
- [S.D,"Which customer benefits most from Dolby Vision?",["Movie enthusiast","Office worker","Accountant","Student"],0],
- [S.D,"Which feature is least important for watching cable TV?",["AI Upscaling","HDR","HDMI 2.1","Good processing"],2],
- [S.D,"Which question should be asked first before recommending a TV?",["Favourite colour","Room size and viewing distance","Shoe size","Mobile brand"],1],
+ [S.D,"A customer watches movies every night and prioritises deep blacks and cinematic picture quality. Which technology would be particularly relevant?",["OLED","Basic LED","CRT","Standard office monitor"],0],
+ [S.D,"A customer has a very bright living room and watches sports during the daytime. Which factor should receive particular consideration?",["Panel brightness and reflection handling","Number of USB ports only","Remote control colour","TV stand design only"],0],
+ [S.D,"A hotel wants a display for a reception area that will operate for long periods and requires commercial management features. What should the salesperson consider?",["Consumer gaming monitor","Commercial display solution","Portable Bluetooth speaker","Basic home projector"],1],
+ [S.D,"Before recommending a television, which combination of questions is most useful?",["Customer's favourite colour and mobile phone brand","Room size, viewing distance, usage, content, budget and preferred features","Customer's preferred electricity provider only","Customer's preferred remote-control design"],1],
+ [S.D,"A customer says, \"I can get the same size TV cheaper from another retailer.\" What should the salesperson do first?",["Immediately offer the maximum discount","Tell the customer the competitor's product is inferior","Understand the exact competing model and compare specifications, warranty, service, features and total value","End the discussion"],2],
 
- [S.E,"Gross margin means:",["Sales minus direct product cost","Sales after tax","Total profit","Cash flow"],0],
- [S.E,"High inventory turnover generally indicates:",["Strong stock movement","Poor demand","High returns","High warranty claims"],0],
- [S.E,"Which product usually delivers higher gross margins?",["Premium accessories","Entry-level TVs","Clearance products","End-of-life stock"],0],
- [S.E,"Why should ageing stock be monitored?",["To reduce inventory carrying costs","To increase warranty","To improve Wi-Fi","To improve brightness"],0],
- [S.E,"Cross-selling increases:",["Average transaction value","Screen size","Internet speed","Warranty period"],0],
- [S.E,"Which KPI best measures stock efficiency?",["Inventory Turnover","Brightness","Wattage","Screen size"],0],
-
- [S.F,"A customer cannot stream Netflix in 4K. The most likely reason is:",["Standard Netflix plan","HDMI cable","TV size","Remote battery"],0],
- [S.F,"Picture is good but there is no sound through the soundbar. First check:",["HDMI eARC connection","TV stand","Wall mount","Brightness"],0],
- [S.F,"Bluetooth pairing fails. First action:",["Restart Bluetooth devices","Replace TV","Factory repair","Buy another speaker"],0],
- [S.F,"Customer experiences buffering only at night. Most likely cause:",["Internet congestion","Burn-in","HDR","Panel fault"],0],
-
- [S.G,"AI Picture Mode mainly:",["Optimises picture automatically","Improves internet","Increases storage","Reduces power bills"],0],
- [S.G,"Which technology provides the highest brightness today?",["OLED","Mini LED","Plasma","LCD"],1],
- [S.G,"Which display technology is best for cinematic contrast?",["OLED","Standard LED","LCD","CRT"],0],
- [S.G,"What is the primary purpose of a local dimming zone?",["Reduce power consumption","Improve contrast by controlling backlight","Increase internet speed","Improve sound"],1],
- [S.G,"Why is HDMI 2.1 valuable for gamers?",["Faster charging","Supports 4K 120Hz, VRR and ALLM","Better Bluetooth","Better Wi-Fi"],1],
- [S.G,"Which statement best describes an excellent electronics salesperson?",["Knows specifications only","Offers the cheapest product","Understands customer needs and recommends the best solution","Sells only premium products"],2]
+ [S.E,"What does TT mean in international trade?",["Trade Transfer","Telegraphic Transfer","Terminal Trade","Transaction Tax"],1],
+ [S.E,"A supplier requests 30% TT advance and 70% against shipping documents. What does this mean?",["The supplier gives 30% credit and asks for 70% cash on delivery","30% is paid upfront and the remaining 70% is paid when the agreed shipping documents are presented according to the payment arrangement","30% is paid by the freight forwarder","70% is paid before production begins"],1],
+ [S.E,"What does LC stand for?",["Logistics Confirmation","Local Currency","Letter of Credit","Loading Certificate"],2],
+ [S.E,"What is the primary purpose of a Letter of Credit?",["To reduce container size","To provide a bank-mediated payment mechanism subject to specified documentary conditions","To guarantee product quality","To eliminate import taxes"],1],
+ [S.E,"Under a 100% LC at sight, payment is generally made:",["After the goods are sold in Sri Lanka","90 days after arrival","Upon presentation of compliant documents according to the LC terms","Before the supplier receives the purchase order"],2],
+ [S.E,"Which document normally contains the product description, quantity, unit price and total invoice value?",["Commercial Invoice","Packing List","Bill of Lading","Certificate of Origin"],0],
+ [S.E,"What is the primary purpose of a Packing List?",["To confirm bank financing","To show packing details such as cartons, quantities, dimensions and weights","To establish the product warranty","To calculate employee salaries"],1],
+ [S.E,"What is a Bill of Lading?",["A supplier quotation","A document relating to the carriage of goods by sea and evidence of the contract of carriage","A customs tax invoice","A purchase requisition"],1],
+ [S.E,"Which container is normally used for general cargo such as televisions and audio products?",["Dry Container","Reefer Container","Tank Container","Livestock Container"],0],
+ [S.E,"What is the key difference between a 20-foot and 40-foot container?",["Only the external colour","They have different dimensions and cargo capacities","A 40-foot container can only carry food products","A 20-foot container is used only for air freight"],1],
+ [S.E,"What does LCL mean?",["Limited Cargo Logistics","Less than Container Load","Local Container Loading","Low Cost Loading"],1],
+ [S.E,"A shipment is only 8 CBM and does not justify booking an entire container. Which option would generally be considered?",["LCL","FCL","Air charter","Reefer container"],0],
+ [S.E,"What is the main difference between FCL and LCL?",["FCL is always air freight","FCL generally uses a container allocated to one shipment/customer, while LCL cargo shares container space with other cargo","LCL is only used for hazardous goods","FCL cannot carry electronics"],1],
+ [S.E,"Which sequence best represents a typical import process?",["Shipment → customer sale → purchase order → production → customs","Supplier quotation → purchase order → production → shipment → customs clearance → warehouse","Customs → production → purchase order → shipment → supplier quotation","Warehouse → shipment → supplier quotation → production → purchase order"],1],
+ [S.E,"A supplier offers goods on FOB Shanghai. Which statement is most accurate?",["The seller is responsible for delivering the goods on board the vessel at the agreed port, with the buyer generally taking responsibility for the main carriage and subsequent costs/risk according to the agreed Incoterm","The seller pays all costs until the goods reach the buyer's warehouse","The buyer has no shipping responsibility","The seller pays Sri Lankan import duties"],0],
+ [S.E,"Under CIF Colombo, the seller generally provides:",["Only the product cost","Cost, insurance and freight to the named destination port","Sri Lankan customs duty and local delivery","Warehouse storage and local transportation"],1],
+ [S.E,"What does CBM mean?",["Container Booking Measurement","Cargo Balance Method","Cubic Metre","Customs Billing Method"],2],
+ [S.E,"A shipment contains 500 cartons, and each carton has a volume of 0.08 CBM. What is the total cargo volume?",["4 CBM","20 CBM","40 CBM","80 CBM"],2],
+ [S.E,"A supplier informs you that the shipment has ETD 10 October and ETA Colombo 25 October. What does this mean?",["The goods will definitely reach the warehouse on 25 October","The vessel is expected to depart on 10 October and arrive at Colombo around 25 October","Customs clearance will finish on 25 October","The supplier will deliver the goods to the customer on 25 October"],1],
+ [S.E,"An imported electronics container arrives in Colombo but cannot be cleared because required documentation is incomplete. What is a possible consequence?",["The shipment automatically becomes duty-free","The supplier must automatically pay every local cost","Clearance may be delayed and additional port, storage or container-related costs may arise depending on the circumstances","The container is automatically returned to the supplier"],2]
 ];
 const LETTERS = ["A","B","C","D"];
+// Result levels (percentage)
+function levelFor(pct){
+  if(pct >= 85) return "Excellent understanding";
+  if(pct >= 70) return "Good working knowledge";
+  if(pct >= 55) return "Basic operational knowledge";
+  return "Requires further training";
+}
 const TOTAL = QUESTIONS.length;
 const STORE_KEY = "advElecTest_progress_" + CONFIG.TEST_ID;
 
@@ -382,10 +398,10 @@ async function saveToGitHub(payload){
   if(payload.action === "start"){
     const now = new Date(), id = newId();
     await ghUpdate(`Started: ${payload.name} (${payload.msps})`, records => {
-      if(!CONFIG.ALLOW_RETAKE && records.some(r => r.msps === payload.msps && r.status === "completed")){
+      if(!CONFIG.ALLOW_RETAKE && records.some(r => r.msps === payload.msps && r.status === "completed" && r.testId === CONFIG.TEST_ID)){
         const e = new Error("already_completed"); e.code = "already_completed"; throw e;
       }
-      records.push({ id, name:payload.name, msps:payload.msps, status:"started",
+      records.push({ id, testId: CONFIG.TEST_ID, test: document.title, name:payload.name, msps:payload.msps, status:"started",
         startedAt: now.toISOString(), startedAtLocal: sriLankaTime(now),
         completedAt:null, completedAtLocal:null, timeTaken:null, timeTakenSeconds:null,
         correct:null, marks:null, percentage:null, result:null,
@@ -403,7 +419,7 @@ async function saveToGitHub(payload){
     let rec = id ? records.find(x => x.id === id) : null;
     if(!rec){
       const st = new Date(payload.startedAt);
-      rec = { id: id || newId(), name:payload.name, msps:payload.msps, startedAt: st.toISOString(), startedAtLocal: sriLankaTime(st) };
+      rec = { id: id || newId(), testId: CONFIG.TEST_ID, name:payload.name, msps:payload.msps, startedAt: st.toISOString(), startedAtLocal: sriLankaTime(st) };
       records.push(rec);
     }
     id = rec.id;
@@ -411,7 +427,7 @@ async function saveToGitHub(payload){
     Object.assign(rec, {
       status:"completed", completedAt: r.completedAt, completedAtLocal: sriLankaTime(done),
       timeTaken: fmtTimeWords(r.timeTakenSeconds), timeTakenSeconds: r.timeTakenSeconds,
-      correct: `${r.correct}/${r.total}`, marks: r.marks, percentage: r.percentage, result: r.status,
+      correct: `${r.correct}/${r.total}`, marks: r.marks, percentage: r.percentage, result: r.status, level: levelFor(r.percentage),
       sections,
       wrongQuestions: payload.answers.map((a,i) => a === QUESTIONS[i][3] ? null : i+1).filter(Boolean),
       answers: payload.answers.map(a => LETTERS[a] || "-").join("")
@@ -647,6 +663,8 @@ function showResults(){
   $("resCorrect").textContent = `${r.correct} / ${r.total}`;
   $("resTime").textContent = fmtTimeWords(r.timeTakenSeconds);
   $("resStatus").innerHTML = `<span class="badge ${r.status === "PASS" ? "pass" : "fail"}">${r.status}</span>`;
+  $("resLevel").textContent = levelFor(r.percentage);
+  $("fAll").textContent = `All ${r.total}`;
 
   let t = "<tr><th>Section</th><th class='n'>Correct</th><th class='n'>Marks</th><th style='width:30%'></th></tr>";
   Object.entries(r.sections).forEach(([name,s]) => {
